@@ -1,11 +1,8 @@
-// It might be a good idea to add event listener to make sure this file 
-// only runs after the DOM has finshed loading.
-
 document.addEventListener('DOMContentLoaded', init())
 
 function init() {
-    addEventListeners()
     getQuotes()
+    addEventListeners()
 }
 
 function getQuotes() {
@@ -15,18 +12,22 @@ function getQuotes() {
 
 function renderQuote(quote) {
     console.log(quote)
-    html = ` <li class='quote-card'>
+    html = ` <li id=${quote.id} class='quote-card'>
     <blockquote class="blockquote">
       <p class="mb-0">${quote.quote}</p>
       <footer class="blockquote-footer">${quote.author}</footer>
       <br>
       <button class='btn-success'>Likes: <span>0</span></button>
-      <button class='btn-danger'>Delete</button>
+      <button data-id=${quote.id} class='btn-danger'>Delete</button>
     </blockquote>
   </li> `
     const quoteContainer = document.querySelector('#quote-list')
-
     quoteContainer.innerHTML += html
+    const buttons = document.querySelectorAll('.btn-danger')
+    buttons.forEach(function (button) {
+        button.addEventListener('click', deletePost)
+    })
+    //debugger
 }
 
 function addEventListeners() {
@@ -39,7 +40,6 @@ function saveQuote(event) {
     console.log(event)
     let quoteField = event.target.quote.value
     let authorField = event.target.author.value
-    
     //debugger
     fetch("http://localhost:3000/quotes", 
         {   method: 'POST',
@@ -50,5 +50,19 @@ function saveQuote(event) {
         }
     ).then(response => response.json())
      .then(renderQuote, event.target.reset())
-     
+}
+
+function deletePost(event) {
+    console.log('post id:' , event.target.dataset.id)
+    const postId = event.target.dataset.id
+    //debugger
+    fetch(`http://localhost:3000/quotes/${postId}`, 
+        {   method: 'DELETE',
+            headers: {'Content-Type': 'application/json'}
+        }
+    ).then(response => response.json())
+     .then(console.log)
+    let post = document.getElementById(postId)
+    post.remove()
+
 }
