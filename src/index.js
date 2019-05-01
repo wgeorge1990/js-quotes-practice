@@ -37,4 +37,18 @@ function addEventListeners() {
 function saveQuote(event) {
     event.preventDefault()
     console.log(event)
+    let quoteField = event.target.quote.value
+    let authorField = event.target.author.value
+    
+    //debugger
+    fetch("http://localhost:3000/quotes", 
+        {   method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify( 
+               { quote: quoteField,
+                authore: authorField } )
+        }
+    ).then(response => response.json())
+     .then(renderQuote, event.target.reset())
+     
 }
